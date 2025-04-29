@@ -3,163 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess My Answers Quiz</title>
+    <title>My Fun Quiz</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            text-align: center;
-        }
-        h1 {
-            color: #ff6666;
-        }
-        .quiz-container {
-            background-color: #ffcccc;
+            background-color: #f4f4f4;
+            color: #333;
             padding: 20px;
-            border-radius: 10px;
-            width: 60%;
-            margin: auto;
+        }
+        .question-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
         }
         .question {
-            margin: 20px 0;
+            font-size: 1.5em;
+            margin-bottom: 20px;
         }
-        .button {
-            background-color: #ff6666;
-            color: white;
-            padding: 10px 20px;
-            border: none;
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            justify-items: center;
+        }
+        .option {
+            padding: 10px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
             cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 50px;
+            margin-bottom: 10px;
+        }
+        .next-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
             border-radius: 5px;
-            font-size: 16px;
+            cursor: pointer;
         }
-        .button:hover {
-            background-color: #ff4d4d;
+        .next-btn:disabled {
+            background-color: #cccccc;
         }
-        .results {
-            background-color: #d1f7d1;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 10px;
+        .result {
+            display: none;
+            text-align: center;
+        }
+        .result p {
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-
-<h1>Guess My Answers Quiz</h1>
-
-<div class="quiz-container">
-    <!-- User Section (for answering) -->
-    <div id="userSection">
-        <h3>Answer These Questions:</h3>
-
-        <div class="question">
-            <p>What's your favorite color?</p>
-            <label><input type="radio" name="q1" value="Red" /> Red</label><br>
-            <label><input type="radio" name="q1" value="Blue" /> Blue</label><br>
-            <label><input type="radio" name="q1" value="Green" /> Green</label><br>
+    <div id="quiz-container">
+        <div id="question-container" class="question-container">
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <button id="next-btn" class="next-btn">Next</button>
         </div>
 
-        <div class="question">
-            <p>What's your ideal vacation spot?</p>
-            <label><input type="radio" name="q2" value="Beach" /> Beach</label><br>
-            <label><input type="radio" name="q2" value="Mountains" /> Mountains</label><br>
-            <label><input type="radio" name="q2" value="City" /> City</label><br>
+        <div id="result-container" class="result">
+            <h2>Your Score: <span id="score"></span> / 10</h2>
+            <p>Thanks for playing!</p>
         </div>
-
-        <div class="question">
-            <p>What's your favorite food?</p>
-            <label><input type="radio" name="q3" value="Pizza" /> Pizza</label><br>
-            <label><input type="radio" name="q3" value="Salad" /> Salad</label><br>
-            <label><input type="radio" name="q3" value="Burger" /> Burger</label><br>
-        </div>
-
-        <button class="button" onclick="generateLink()">Generate My Link</button>
     </div>
 
-    <!-- Link Section (to share the link) -->
-    <div id="linkSection" style="display:none;">
-        <h3>Your Unique Quiz Link:</h3>
-        <p id="quizLink"></p>
-        <p>Share this link with your friends!</p>
-    </div>
+    <script>
+        const questions = [
+            {
+                question: "What is my favourite color?",
+                options: [
+                    { answer: "Red", image: "https://via.placeholder.com/50x50/FF0000/FFFFFF?text=Red", correct: true },
+                    { answer: "Blue", image: "https://via.placeholder.com/50x50/0000FF/FFFFFF?text=Blue", correct: false },
+                    { answer: "Green", image: "https://via.placeholder.com/50x50/008000/FFFFFF?text=Green", correct: false },
+                    { answer: "Yellow", image: "https://via.placeholder.com/50x50/FFFF00/FFFFFF?text=Yellow", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite food?",
+                options: [
+                    { answer: "Pizza", image: "https://via.placeholder.com/50x50/FF6347/FFFFFF?text=Pizza", correct: true },
+                    { answer: "Burger", image: "https://via.placeholder.com/50x50/FFD700/FFFFFF?text=Burger", correct: false },
+                    { answer: "Noodles", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Noodles", correct: false },
+                    { answer: "Sushi", image: "https://via.placeholder.com/50x50/00CED1/FFFFFF?text=Sushi", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite animal?",
+                options: [
+                    { answer: "Cat", image: "https://via.placeholder.com/50x50/FFD700/FFFFFF?text=Cat", correct: true },
+                    { answer: "Dog", image: "https://via.placeholder.com/50x50/FF4500/FFFFFF?text=Dog", correct: false },
+                    { answer: "Pig", image: "https://via.placeholder.com/50x50/FFC0CB/FFFFFF?text=Pig", correct: false },
+                    { answer: "Cow", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Cow", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite sport?",
+                options: [
+                    { answer: "Football", image: "https://via.placeholder.com/50x50/008000/FFFFFF?text=Football", correct: true },
+                    { answer: "Basketball", image: "https://via.placeholder.com/50x50/0000FF/FFFFFF?text=Basketball", correct: false },
+                    { answer: "Volleyball", image: "https://via.placeholder.com/50x50/FFFF00/FFFFFF?text=Volleyball", correct: false },
+                    { answer: "Tennis", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Tennis", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite season?",
+                options: [
+                    { answer: "Summer", image: "https://via.placeholder.com/50x50/FF6347/FFFFFF?text=Summer", correct: true },
+                    { answer: "Winter", image: "https://via.placeholder.com/50x50/00CED1/FFFFFF?text=Winter", correct: false },
+                    { answer: "Autumn", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Rainy", correct: false },
+                    { answer: "Spring", image: "https://via.placeholder.com/50x50/00FF00/FFFFFF?text=Spring", correct: false }
+                ]
+            },
+            {
+                question: "What is my dream vacation destination?",
+                options: [
+                    { answer: "Seoul", image: "https://via.placeholder.com/50x50/FFFF00/FFFFFF?text=Seoul", correct: true },
+                    { answer: "Paris", image: "https://via.placeholder.com/50x50/0000FF/FFFFFF?text=Paris", correct: false },
+                    { answer: "Tokyo", image: "https://via.placeholder.com/50x50/FF6347/FFFFFF?text=Tokyo", correct: false },
+                    { answer: "London", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=London", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite music genre?",
+                options: [
+                    { answer: "Rock", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Rock", correct: true },
+                    { answer: "Pop", image: "https://via.placeholder.com/50x50/FF6347/FFFFFF?text=Pop", correct: false },
+                    { answer: "Jazz", image: "https://via.placeholder.com/50x50/FFD700/FFFFFF?text=Jazz", correct: false },
+                    { answer: "K-pop", image: "https://via.placeholder.com/50x50/FF1493/FFFFFF?text=K-pop", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite book genre?",
+                options: [
+                    { answer: "Science Fiction", image: "https://via.placeholder.com/50x50/8A2BE2/FFFFFF?text=Sci-Fi", correct: true },
+                    { answer: "Fantasy", image: "https://via.placeholder.com/50x50/FF6347/FFFFFF?text=Fantasy", correct: false },
+                    { answer: "Mystery", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Mystery", correct: false },
+                    { answer: "Romance", image: "https://via.placeholder.com/50x50/FF1493/FFFFFF?text=Romance", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite holiday?",
+                options: [
+                    { answer: "Christmas", image: "https://via.placeholder.com/50x50/FF6347/FFFFFF?text=Christmas", correct: true },
+                    { answer: "Halloween", image: "https://via.placeholder.com/50x50/FF1493/FFFFFF?text=Halloween", correct: false },
+                    { answer: "Easter", image: "https://via.placeholder.com/50x50/FFD700/FFFFFF?text=Easter", correct: false },
+                    { answer: "New Year's Eve", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=NYE", correct: false }
+                ]
+            },
+            {
+                question: "What is my favourite type of weather?",
+                options: [
+                    { answer: "Sunny", image: "https://via.placeholder.com/50x50/FFD700/FFFFFF?text=Sunny", correct: true },
+                    { answer: "Cloudy", image: "https://via.placeholder.com/50x50/808080/FFFFFF?text=Cloudy", correct: false },
+                    { answer: "Windy", image: "https://via.placeholder.com/50x50/00CED1/FFFFFF?text=Windy", correct: false },
+                    { answer: "Rainy", image: "https://via.placeholder.com/50x50/8B4513/FFFFFF?text=Rainy", correct: false }
+                ]
+            }
+        ];
 
-    <!-- Guess Section (for others to guess) -->
-    <div id="guessSection" style="display:none;">
-        <h3>Guess the Answers!</h3>
-        <p>Can you guess the answers?</p>
+        let currentQuestionIndex = 0;
+        let score = 0;
 
-        <div class="question">
-            <p>What's the favorite color?</p>
-            <label><input type="radio" name="guess1" value="Red" /> Red</label><br>
-            <label><input type="radio" name="guess1" value="Blue" /> Blue</label><br>
-            <label><input type="radio" name="guess1" value="Green" /> Green</label><br>
-        </div>
+        function showQuestion() {
+            const questionContainer = document.getElementById('question');
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            const question = questions[currentQuestionIndex];
+            questionContainer.innerText = question.question;
 
-        <div class="question">
-            <p>What's the ideal vacation spot?</p>
-            <label><input type="radio" name="guess2" value="Beach" /> Beach</label><br>
-            <label><input type="radio" name="guess2" value="Mountains" /> Mountains</label><br>
-            <label><input type="radio" name="guess2" value="City" /> City</label><br>
-        </div>
-
-        <div class="question">
-            <p>What's the favorite food?</p>
-            <label><input type="radio" name="guess3" value="Pizza" /> Pizza</label><br>
-            <label><input type="radio" name="guess3" value="Salad" /> Salad</label><br>
-            <label><input type="radio" name="guess3" value="Burger" /> Burger</label><br>
-        </div>
-
-        <button class="button" onclick="checkGuess()">Submit Guess</button>
-    </div>
-
-    <!-- Results Section (showing score) -->
-    <div id="resultsSection" style="display:none;">
-        <h3>Your Results:</h3>
-        <p id="resultsMessage"></p>
-        <p>Your Score: <span id="score"></span>/3</p>
-    </div>
-</div>
-
-<script>
-    function generateLink() {
-        const answers = {
-            q1: document.querySelector('input[name="q1"]:checked')?.value,
-            q2: document.querySelector('input[name="q2"]:checked')?.value,
-            q3: document.querySelector('input[name="q3"]:checked')?.value
-        };
-
-        if (!answers.q1 || !answers.q2 || !answers.q3) {
-            alert("Please answer all questions.");
-            return;
+            question.options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.classList.add('option');
+                optionDiv.innerHTML = `<img src="${option.image}" alt="${option.answer}"><br>${option.answer}`;
+                optionDiv.addEventListener('click', () => {
+                    if (option.correct) {
+                        score++;
+                    }
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < questions.length) {
+                        showQuestion();
+                    } else {
+                        showResult();
+                    }
+                });
+                optionsContainer.appendChild(optionDiv);
+            });
         }
 
-        const link = `${window.location.href}#q1=${answers.q1}&q2=${answers.q2}&q3=${answers.q3}`;
-        document.getElementById('quizLink').textContent = link;
+        function showResult() {
+            document.getElementById('quiz-container').style.display = 'none';
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.style.display = 'block';
+            document.getElementById('score').innerText = score;
+        }
 
-        document.getElementById('userSection').style.display = 'none';
-        document.getElementById('linkSection').style.display = 'block';
-        document.getElementById('guessSection').style.display = 'block';
-    }
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        });
 
-    function checkGuess() {
-        const params = new URLSearchParams(window.location.hash.slice(1));
-        const correctAnswers = {
-            q1: params.get('q1'),
-            q2: params.get('q2'),
-            q3: params.get('q3')
-        };
-
-        let score = 0;
-        if (document.querySelector('input[name="guess1"]:checked')?.value === correctAnswers.q1) score++;
-        if (document.querySelector('input[name="guess2"]:checked')?.value === correctAnswers.q2) score++;
-        if (document.querySelector('input[name="guess3"]:checked')?.value === correctAnswers.q3) score++;
-
-        document.getElementById('score').textContent = score;
-        document.getElementById('resultsMessage').textContent = `You guessed ${score} correct answers!`;
-        document.getElementById('guessSection').style.display = 'none';
-        document.getElementById('resultsSection').style.display = 'block';
-    }
-</script>
-
+        showQuestion();
+    </script>
 </body>
 </html>
