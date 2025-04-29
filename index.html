@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess My Answers Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+        }
+        h1 {
+            color: #ff6666;
+        }
+        .quiz-container {
+            background-color: #ffcccc;
+            padding: 20px;
+            border-radius: 10px;
+            width: 60%;
+            margin: auto;
+        }
+        .question {
+            margin: 20px 0;
+        }
+        .button {
+            background-color: #ff6666;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #ff4d4d;
+        }
+        .results {
+            background-color: #d1f7d1;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Guess My Answers Quiz</h1>
+
+<div class="quiz-container">
+    <!-- User Section (for answering) -->
+    <div id="userSection">
+        <h3>Answer These Questions:</h3>
+
+        <div class="question">
+            <p>What's your favorite color?</p>
+            <label><input type="radio" name="q1" value="Red" /> Red</label><br>
+            <label><input type="radio" name="q1" value="Blue" /> Blue</label><br>
+            <label><input type="radio" name="q1" value="Green" /> Green</label><br>
+        </div>
+
+        <div class="question">
+            <p>What's your ideal vacation spot?</p>
+            <label><input type="radio" name="q2" value="Beach" /> Beach</label><br>
+            <label><input type="radio" name="q2" value="Mountains" /> Mountains</label><br>
+            <label><input type="radio" name="q2" value="City" /> City</label><br>
+        </div>
+
+        <div class="question">
+            <p>What's your favorite food?</p>
+            <label><input type="radio" name="q3" value="Pizza" /> Pizza</label><br>
+            <label><input type="radio" name="q3" value="Salad" /> Salad</label><br>
+            <label><input type="radio" name="q3" value="Burger" /> Burger</label><br>
+        </div>
+
+        <button class="button" onclick="generateLink()">Generate My Link</button>
+    </div>
+
+    <!-- Link Section (to share the link) -->
+    <div id="linkSection" style="display:none;">
+        <h3>Your Unique Quiz Link:</h3>
+        <p id="quizLink"></p>
+        <p>Share this link with your friends!</p>
+    </div>
+
+    <!-- Guess Section (for others to guess) -->
+    <div id="guessSection" style="display:none;">
+        <h3>Guess the Answers!</h3>
+        <p>Can you guess the answers?</p>
+
+        <div class="question">
+            <p>What's the favorite color?</p>
+            <label><input type="radio" name="guess1" value="Red" /> Red</label><br>
+            <label><input type="radio" name="guess1" value="Blue" /> Blue</label><br>
+            <label><input type="radio" name="guess1" value="Green" /> Green</label><br>
+        </div>
+
+        <div class="question">
+            <p>What's the ideal vacation spot?</p>
+            <label><input type="radio" name="guess2" value="Beach" /> Beach</label><br>
+            <label><input type="radio" name="guess2" value="Mountains" /> Mountains</label><br>
+            <label><input type="radio" name="guess2" value="City" /> City</label><br>
+        </div>
+
+        <div class="question">
+            <p>What's the favorite food?</p>
+            <label><input type="radio" name="guess3" value="Pizza" /> Pizza</label><br>
+            <label><input type="radio" name="guess3" value="Salad" /> Salad</label><br>
+            <label><input type="radio" name="guess3" value="Burger" /> Burger</label><br>
+        </div>
+
+        <button class="button" onclick="checkGuess()">Submit Guess</button>
+    </div>
+
+    <!-- Results Section (showing score) -->
+    <div id="resultsSection" style="display:none;">
+        <h3>Your Results:</h3>
+        <p id="resultsMessage"></p>
+        <p>Your Score: <span id="score"></span>/3</p>
+    </div>
+</div>
+
+<script>
+    function generateLink() {
+        const answers = {
+            q1: document.querySelector('input[name="q1"]:checked')?.value,
+            q2: document.querySelector('input[name="q2"]:checked')?.value,
+            q3: document.querySelector('input[name="q3"]:checked')?.value
+        };
+
+        if (!answers.q1 || !answers.q2 || !answers.q3) {
+            alert("Please answer all questions.");
+            return;
+        }
+
+        const link = `${window.location.href}#q1=${answers.q1}&q2=${answers.q2}&q3=${answers.q3}`;
+        document.getElementById('quizLink').textContent = link;
+
+        document.getElementById('userSection').style.display = 'none';
+        document.getElementById('linkSection').style.display = 'block';
+        document.getElementById('guessSection').style.display = 'block';
+    }
+
+    function checkGuess() {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const correctAnswers = {
+            q1: params.get('q1'),
+            q2: params.get('q2'),
+            q3: params.get('q3')
+        };
+
+        let score = 0;
+        if (document.querySelector('input[name="guess1"]:checked')?.value === correctAnswers.q1) score++;
+        if (document.querySelector('input[name="guess2"]:checked')?.value === correctAnswers.q2) score++;
+        if (document.querySelector('input[name="guess3"]:checked')?.value === correctAnswers.q3) score++;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('resultsMessage').textContent = `You guessed ${score} correct answers!`;
+        document.getElementById('guessSection').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
